@@ -273,6 +273,7 @@ bool HelpCmd::execute()
     DrawCmd* drawCmdObj = new DrawCmd(m_receiver, m_args);
     SetStyleCmd* setStyleCmdObj = new SetStyleCmd(m_receiver, m_args);
     ExitCmd* exitCmdObj = new ExitCmd(m_receiver, m_args);
+    ClearCmd* clearCmdObj = new ClearCmd(m_receiver, m_args);
 
     if (m_args.size() == 0)
     {
@@ -284,6 +285,7 @@ bool HelpCmd::execute()
         drawCmdObj->printGeneralHelp();
         setStyleCmdObj->printGeneralHelp();
         exitCmdObj->printGeneralHelp();
+        clearCmdObj->printGeneralHelp();
     }
     else if (m_args.size() == 1)
     {
@@ -318,6 +320,10 @@ bool HelpCmd::execute()
         else if (m_args[0] == "exit")
         {
             exitCmdObj->printDetailedHelp();
+        }
+        else if (m_args[0] == "clear")
+        {
+            clearCmdObj->printDetailedHelp();
         }
         else
         {
@@ -369,6 +375,60 @@ void ExitCmd::printDetailedHelp() const
     printGeneralHelp();
 }
 
+ClearCmd::ClearCmd(CommandReceiver& r, const StringArgs& args) : Command(r, args)
+{
+}
+
+bool ClearCmd::execute()
+{
+    Shapes& shapesVector = m_receiver.getShapesVector();
+    std::cout << "\n";
+    if (m_args.size() < 1u)
+    {
+        return false;
+    }
+    if (m_args[0] == "all")
+    {
+        shapesVector.clear();
+        std::cout << "All Shapes was deleted!\n\n";
+
+    }
+    else 
+    { 
+        int x = std::atoi(m_args[0].c_str());
+        if (x == 0 || x > shapesVector.size())
+        {
+            std::cout << "Invalid shape number!";
+            return false;
+        }
+        else //to do change this to clear position 
+        {
+            int x = std::atoi(m_args[0].c_str());
+            shapesVector.erase(shapesVector.begin() + x - 1);
+            std::cout << "\nShape number " << x << " was deleted!\n\n";
+        }
+    }
+    return true;
+}
+
+void ClearCmd::printGeneralHelp() const
+{
+    std::cout << "\nclear\n";
+    std::cout << "Erase a shape / shapes from program memory\n\n";
+}
+
+void ClearCmd::printDetailedHelp() const
+{
+    printGeneralHelp();
+    std::cout << "Syntax:\n"
+        << "clear <all> \n"
+        << "clear <shape_id>\n";
+    std::cout << "Arguments:\n"
+        << "all - when used all shapes are erased\n"
+        << "shape_id - identifier of a shape of which you want erase, the id can be taken by \"list-shapes\" command\n\n";
+}
+
+
 Command* createCommand(CommandReceiver& receiver, const std::string& cmdName, const StringArgs& args)
 {
     if (cmdName == "tri")
@@ -402,6 +462,10 @@ Command* createCommand(CommandReceiver& receiver, const std::string& cmdName, co
     else if (cmdName == "exit")
     {
         return new ExitCmd(receiver, args);
+    }
+    else if (cmdName == "clear")
+    {
+        return new ClearCmd(receiver, args);
     }
     else
     {

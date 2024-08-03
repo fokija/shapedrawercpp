@@ -95,6 +95,15 @@ public:
     void printDetailedHelp() const override; 
 };
 
+class ClearCmd : public Command
+{
+public:
+    ClearCmd(CommandReceiver& r, const StringArgs& args);
+    bool execute() override;
+    void printGeneralHelp() const override;
+    void printDetailedHelp() const override;
+};
+
 class CommandReceiver
 {
 private:
